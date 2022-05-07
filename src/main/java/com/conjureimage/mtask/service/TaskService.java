@@ -53,12 +53,7 @@ public class TaskService {
         }
         task.setStatus(status);
         AppUser user;
-        try {
-            user = SecurityUtil.getUserDetails();
-        } catch (UserNotAuthenticated userNotAuthenticated) {
-            userNotAuthenticated.printStackTrace();
-            return null;
-        }
+        user = SecurityUtil.getUserDetails();
         task.setCreatedBy(user);
         if (task.getAssignedTo() == null) {
             task.setAssignedTo(user);

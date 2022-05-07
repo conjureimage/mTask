@@ -11,6 +11,6 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     AppUser findByEmail(String email);
 
     @SuppressWarnings("JpaQlInspection")
-    @Query("select m from AppUser m where lower(concat(m.username, ' ') ) like lower(concat('%',:query, '%') ) ")
+    @Query("select m from AppUser m where lower(concat(m.email, ' ') ) like lower(concat('%',:query, '%') ) ")
     List<AppUser> findUsers(@Param("query") String query);
 }
