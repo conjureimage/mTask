@@ -13,6 +13,8 @@ import com.conjureimage.mtask.service.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,14 +25,14 @@ public class BoardService {
     private BoardAppUserRoleRepository boardAppUserRoleRepository;
 
     public List<Board> findByUser(AppUser appUser) {
-        return boardRepository.findByBoardAppUserRole(appUser);
+        return boardRepository.findByBoardAppUserRoleAppUser(appUser);
     }
 
     public Board findBySlug(String slug) {
         return boardRepository.findBySlug(slug);
     }
 
-    public Board createBoard(String title) throws UserNotAuthenticated {
+    public Board createBoard(String title, HttpServletRequest request) throws UserNotAuthenticated {
         Board board = new Board();
         board.setTitle(title);
         String slug = StringUtils.randomString(8);
@@ -41,9 +43,14 @@ public class BoardService {
         board = boardRepository.save(board);
         BoardAppUserRole boardAppUserRole = new BoardAppUserRole();
         boardAppUserRole.setBoard(board);
-        boardAppUserRole.setAppUser(SecurityUtil.getUserDetails());
+        boardAppUserRole.setAppUser(SecurityUtil.getUserDetails(request));
         boardAppUserRole.setAppUserRole(AppUserRole.ROLE_ADMIN);
         boardAppUserRoleRepository.save(boardAppUserRole);
+        List<BoardAppUserRole> list = new ArrayList<>();
+        list = board.getBoardAppUserRole();
+        list.add(boardAppUserRole);
+        board.setBoardAppUserRole(list);
+        System.out.println(list);
         return board;
     }
 
@@ -56,7 +63,7 @@ public class BoardService {
         return boardRepository.save(myBoard);
     }
 
-    public List<BoardAppUserRole> addUserToBoard(String slug, AppUser user, AppUserRole appUserRole) throws UserNotAuthenticated {
+    public List<BoardAppUserRole> addUserToBoard(String slug, AppUser user, AppUserRole appUserRole, HttpServletRequest request) throws UserNotAuthenticated {
         Board myBoard = boardRepository.findBySlug(slug);
         AppUser appUser = appUserRepository.findByEmail(user.getEmail());
         if (myBoard == null
@@ -65,7 +72,7 @@ public class BoardService {
             return null;
         }
 
-        AppUser me = SecurityUtil.getUserDetails();
+        AppUser me = SecurityUtil.getUserDetails(request);
         for (BoardAppUserRole baur :
                 myBoard.getBoardAppUserRole()) {
 

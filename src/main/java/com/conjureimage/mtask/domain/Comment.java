@@ -1,5 +1,6 @@
 package com.conjureimage.mtask.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -20,6 +21,7 @@ public class Comment extends BaseEntity<Long> {
     private AppUser creator;
 
     @ManyToOne
+    @JsonIgnore
     private Task task;
 
     @Override

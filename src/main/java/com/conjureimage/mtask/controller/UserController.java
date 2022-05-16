@@ -8,6 +8,7 @@ import com.conjureimage.mtask.service.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @RestController
@@ -16,8 +17,8 @@ public class UserController {
     AppUserRepository appUserRepository;
 
     @GetMapping("/api/me")
-    public AppUser me() throws UserNotAuthenticated {
-        return SecurityUtil.getUserDetails();
+    public AppUser me(HttpServletRequest request) throws UserNotAuthenticated {
+        return SecurityUtil.getUserDetails(request);
     }
 
     @GetMapping("/api/users")

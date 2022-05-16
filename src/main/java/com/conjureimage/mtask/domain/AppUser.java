@@ -26,6 +26,9 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "username", nullable = false)
+    private String username;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", length = 20, nullable = false)
     private Role role;

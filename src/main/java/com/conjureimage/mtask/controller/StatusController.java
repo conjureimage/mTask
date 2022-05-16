@@ -2,6 +2,7 @@ package com.conjureimage.mtask.controller;
 
 import com.conjureimage.mtask.domain.Status;
 import com.conjureimage.mtask.service.StatusService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/boards/{slug}/statuses")
+@AllArgsConstructor
 public class StatusController {
     StatusService statusService;
 
@@ -23,9 +25,9 @@ public class StatusController {
         return new ResponseEntity<>(sprints, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{sprintId}")
-    public ResponseEntity<Status> getSprint(@PathVariable String slug, @PathVariable Long sprintId) {
-        Status status = statusService.findByBoardSlugStatusId(slug, sprintId);
+    @GetMapping(value = "/{statusId}")
+    public ResponseEntity<Status> getStatus(@PathVariable String slug, @PathVariable Long statusId) {
+        Status status = statusService.findByBoardSlugStatusId(slug, statusId);
         if (status == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -33,8 +35,8 @@ public class StatusController {
     }
 
     @PostMapping
-    public ResponseEntity<Status> createSprint(@PathVariable String slug, @RequestBody Status status) {
-        Status newStatus = statusService.createStatus(slug, status);
+    public ResponseEntity<Status> createStatus(@PathVariable String slug, @RequestBody String title) {
+        Status newStatus = statusService.createStatus(slug, title);
         if (newStatus == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

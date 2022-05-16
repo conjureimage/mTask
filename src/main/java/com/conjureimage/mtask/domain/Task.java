@@ -1,5 +1,6 @@
 package com.conjureimage.mtask.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -28,6 +29,7 @@ public class Task extends BaseEntity<Long> {
     private String description;
 
     @ManyToOne
+    @JsonIgnore
     private Status status;
 
     @OneToMany(mappedBy = "task")

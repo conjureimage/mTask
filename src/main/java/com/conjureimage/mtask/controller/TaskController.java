@@ -5,15 +5,18 @@ import com.conjureimage.mtask.domain.Task;
 import com.conjureimage.mtask.exception.UserNotAuthenticated;
 import com.conjureimage.mtask.security.utils.SecurityUtil;
 import com.conjureimage.mtask.service.TaskService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/boards/{slug}/statuses/{statusId}/tasks")
+@AllArgsConstructor
 public class TaskController {
     private TaskService taskService;
 
@@ -36,8 +39,8 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@PathVariable String slug, @PathVariable Long statusId, @RequestBody Task task) throws UserNotAuthenticated {
-        Task newTask = taskService.createTask(slug, statusId, task);
+    public ResponseEntity<Task> createTask(@PathVariable String slug, @PathVariable Long statusId, @RequestParam String title, @RequestParam String description, HttpServletRequest request) throws UserNotAuthenticated {
+        Task newTask = taskService.createTask(slug, statusId, title, description, request);
         if (newTask == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -47,7 +50,7 @@ public class TaskController {
         return new ResponseEntity<>(newTask, HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{taskId}")
+    @PutMapping(value = "/{taskId}/{slug}")
     public ResponseEntity<Task> updateTask(@PathVariable String slug, @PathVariable Long statusId, @PathVariable Long taskId, @RequestBody Task task) {
         Task newTask = taskService.updateTask(slug, statusId, taskId, task);
         if (newTask == null) {
@@ -57,8 +60,8 @@ public class TaskController {
     }
 
     @PostMapping(value = "/{taskId}/comments")
-    public ResponseEntity<Comment> addComment(@PathVariable String slug, @PathVariable Long statusId, @PathVariable Long taskId, @RequestBody String comment) throws UserNotAuthenticated {
-        Comment newComment = taskService.addComment(slug, statusId, taskId, comment, SecurityUtil.getUserDetails());
+    public ResponseEntity<Comment> addComment(@PathVariable String slug, @PathVariable Long statusId, @PathVariable Long taskId, @RequestParam String comment, HttpServletRequest request) throws UserNotAuthenticated {
+        Comment newComment = taskService.addComment(slug, statusId, taskId, comment, SecurityUtil.getUserDetails(request));
         if (newComment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

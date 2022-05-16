@@ -31,4 +31,15 @@ public class Board extends BaseEntity<Long> {
     public Long getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return "Board{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", slug='" + slug + '\'' +
+                ", boardAppUserRole=" + boardAppUserRole +
+                ", statuses=" + statuses +
+                '}';
+    }
 }

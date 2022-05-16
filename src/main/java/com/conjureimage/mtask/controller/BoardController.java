@@ -1,5 +1,6 @@
 package com.conjureimage.mtask.controller;
 
+import com.conjureimage.mtask.config.JwtCoder;
 import com.conjureimage.mtask.domain.AppUser;
 import com.conjureimage.mtask.domain.Board;
 import com.conjureimage.mtask.domain.BoardAppUserRole;
@@ -7,12 +8,14 @@ import com.conjureimage.mtask.domain.enums.AppUserRole;
 import com.conjureimage.mtask.exception.UserNotAuthenticated;
 import com.conjureimage.mtask.security.utils.SecurityUtil;
 import com.conjureimage.mtask.service.BoardService;
+import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -22,8 +25,8 @@ public class BoardController {
     BoardService boardService;
 
     @GetMapping
-    public ResponseEntity<Iterable<Board>> getBoards() throws UserNotAuthenticated {
-        return new ResponseEntity<>(boardService.findByUser(SecurityUtil.getUserDetails()), HttpStatus.OK);
+    public ResponseEntity<Iterable<Board>> getBoards(HttpServletRequest request) throws UserNotAuthenticated {
+        return new ResponseEntity<>(boardService.findByUser(SecurityUtil.getUserDetails(request)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{slug}")
@@ -37,9 +40,8 @@ public class BoardController {
     }
 
     @PostMapping
-    public ResponseEntity<Board> saveBoard(@RequestBody String name) throws UserNotAuthenticated {
-        System.out.println(name);
-        return new ResponseEntity<>(boardService.createBoard(name), HttpStatus.CREATED);
+    public ResponseEntity<Board> saveBoard(@RequestBody String name, HttpServletRequest request) throws UserNotAuthenticated {
+        return new ResponseEntity<>(boardService.createBoard(name, request), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{slug}")
@@ -55,13 +57,13 @@ public class BoardController {
     }
 
     @PostMapping(value = "/{slug}/users")
-    public ResponseEntity<List<BoardAppUserRole>> addAppUserToBoard(@PathVariable String slug, @RequestBody AppUser user) throws UserNotAuthenticated {
-        return new ResponseEntity<>(boardService.addUserToBoard(slug, user, AppUserRole.ROLE_USER), HttpStatus.OK);
+    public ResponseEntity<List<BoardAppUserRole>> addAppUserToBoard(@PathVariable String slug, @RequestBody AppUser user, HttpServletRequest request) throws UserNotAuthenticated {
+        return new ResponseEntity<>(boardService.addUserToBoard(slug, user, AppUserRole.ROLE_USER, request), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{slug}/users")
-    public ResponseEntity<List<BoardAppUserRole>> editAppUserInBoard(@PathVariable String slug, @RequestBody BoardAppUserRole boardAppUserRole) throws UserNotAuthenticated {
-        List<BoardAppUserRole> newBoardAppUserRole = boardService.addUserToBoard(slug, boardAppUserRole.getAppUser(), boardAppUserRole.getAppUserRole());
+    public ResponseEntity<List<BoardAppUserRole>> editAppUserInBoard(@PathVariable String slug, @RequestBody BoardAppUserRole boardAppUserRole, HttpServletRequest request) throws UserNotAuthenticated {
+        List<BoardAppUserRole> newBoardAppUserRole = boardService.addUserToBoard(slug, boardAppUserRole.getAppUser(), boardAppUserRole.getAppUserRole(), request);
         boolean removed = true;
         boolean isAdmin = false;
         for (BoardAppUserRole baur :
@@ -77,8 +79,8 @@ public class BoardController {
     }
 
     @DeleteMapping(value = "/{slug}/users/{boardAppUserRole}")
-    public ResponseEntity<Boolean> deleteAppUserInBoard(@PathVariable String slug, @PathVariable Long boardAppUserRole) throws UserNotAuthenticated {
-        boolean deleted = boardService.deleteUserFromBoard(SecurityUtil.getUserDetails(), slug, boardAppUserRole);
+    public ResponseEntity<Boolean> deleteAppUserInBoard(@PathVariable String slug, @PathVariable Long boardAppUserRole, HttpServletRequest request) throws UserNotAuthenticated {
+        boolean deleted = boardService.deleteUserFromBoard(SecurityUtil.getUserDetails(request), slug, boardAppUserRole);
         return new ResponseEntity<>(deleted, HttpStatus.OK);
     }
 }

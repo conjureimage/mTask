@@ -1,6 +1,7 @@
 package com.conjureimage.mtask.domain;
 
 import com.conjureimage.mtask.domain.enums.AppUserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ public class BoardAppUserRole extends BaseEntity<Long> {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     private Board board;
 
     @ManyToOne
@@ -28,5 +30,15 @@ public class BoardAppUserRole extends BaseEntity<Long> {
     @Override
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "BoardAppUserRole{" +
+                "id=" + id +
+                ", board=" + board.getId() +
+                ", appUser=" + appUser.getId() +
+                ", appUserRole=" + appUserRole +
+                '}';
     }
 }

@@ -13,6 +13,7 @@ import com.conjureimage.mtask.security.utils.SecurityUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,15 +46,17 @@ public class TaskService {
         return task;
     }
 
-    public Task createTask(String slug, Long statusId, Task task) {
+    public Task createTask(String slug, Long statusId, String title, String description, HttpServletRequest request) {
         Status status = statusRepository.findById(statusId).orElse(null);
-
         if (status == null || !status.getBoard().getSlug().equals(slug)) {
             return null;
         }
+        Task task = new Task();
         task.setStatus(status);
+        task.setTitle(title);
+        task.setDescription(description);
         AppUser user;
-        user = SecurityUtil.getUserDetails();
+        user = SecurityUtil.getUserDetails(request);
         task.setCreatedBy(user);
         if (task.getAssignedTo() == null) {
             task.setAssignedTo(user);

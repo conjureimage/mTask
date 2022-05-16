@@ -36,11 +36,13 @@ public class StatusService {
         return null;
     }
 
-    public Status createStatus(String slug, Status status) {
+    public Status createStatus(String slug, String title) {
         Board board = boardRepository.findBySlug(slug);
         if (board == null) {
             return null;
         }
+        Status status = new Status();
+        status.setTitle(title);
         status.setBoard(board);
         return statusRepository.save(status);
     }
